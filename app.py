@@ -5,6 +5,7 @@ import json
 import os
 from typing import Dict, List, Union
 import time
+import matplotlib.pyplot as plt
 
 # Load environment variables and OpenAI client
 load_dotenv()
@@ -239,7 +240,25 @@ def evaluate_full_responses(responses):
     
     return evaluation
 
+def display_assessment_graph():
+    """Generate and display a bar chart of competency scores."""
+    if not st.session_state.evaluation_result:
+        return
 
+    # Extract competencies and their scores from the evaluation result
+    competencies = [comp['competency'] for comp in st.session_state.evaluation_result['competencies']]
+    scores = [comp['score'] for comp in st.session_state.evaluation_result['competencies']]
+
+    # Plotting the results
+    fig, ax = plt.subplots()
+    ax.barh(competencies, scores, color='skyblue')
+
+    ax.set_xlabel('Score')
+    ax.set_title('User Assessment by Competency Area')
+    ax.set_xlim(0, 5)  # Since the score ranges from 1 to 5
+
+    # Display the plot in Streamlit
+    st.pyplot(fig)
 
 def display_results():
     """Display the evaluation results with scores and optional justifications"""
@@ -286,6 +305,8 @@ def display_results():
         st.info("Good Performance. Shows solid professional competencies with room for growth.")
     else:
         st.warning("Development Needed. Key areas require significant improvement.")
+        
+    display_assessment_graph()
 
 def main():
     """Main application flow"""
